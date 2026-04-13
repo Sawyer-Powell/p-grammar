@@ -1,0 +1,208 @@
+================================================================================
+Primitive types
+================================================================================
+
+type t1 = int;
+type t2 = bool;
+type t3 = float;
+type t4 = string;
+type t5 = event;
+type t6 = machine;
+type t7 = data;
+type t8 = any;
+
+--------------------------------------------------------------------------------
+
+(program
+  (type_def_decl
+    (p_type_def
+      name: (identifier)
+      (primitive_type)))
+  (type_def_decl
+    (p_type_def
+      name: (identifier)
+      (primitive_type)))
+  (type_def_decl
+    (p_type_def
+      name: (identifier)
+      (primitive_type)))
+  (type_def_decl
+    (p_type_def
+      name: (identifier)
+      (primitive_type)))
+  (type_def_decl
+    (p_type_def
+      name: (identifier)
+      (primitive_type)))
+  (type_def_decl
+    (p_type_def
+      name: (identifier)
+      (primitive_type)))
+  (type_def_decl
+    (p_type_def
+      name: (identifier)
+      (primitive_type)))
+  (type_def_decl
+    (p_type_def
+      name: (identifier)
+      (primitive_type))))
+
+================================================================================
+Seq type
+================================================================================
+
+type tList = seq[int];
+
+--------------------------------------------------------------------------------
+
+(program
+  (type_def_decl
+    (p_type_def
+      name: (identifier)
+      (seq_type
+        (primitive_type)))))
+
+================================================================================
+Set type
+================================================================================
+
+type tSet = set[machine];
+
+--------------------------------------------------------------------------------
+
+(program
+  (type_def_decl
+    (p_type_def
+      name: (identifier)
+      (set_type
+        (primitive_type)))))
+
+================================================================================
+Map type
+================================================================================
+
+type tMap = map[string, int];
+
+--------------------------------------------------------------------------------
+
+(program
+  (type_def_decl
+    (p_type_def
+      name: (identifier)
+      (map_type
+        key_type: (primitive_type)
+        value_type: (primitive_type)))))
+
+================================================================================
+Nested map type
+================================================================================
+
+type tNested = map[string, map[int, any]];
+
+--------------------------------------------------------------------------------
+
+(program
+  (type_def_decl
+    (p_type_def
+      name: (identifier)
+      (map_type
+        key_type: (primitive_type)
+        value_type: (map_type
+          key_type: (primitive_type)
+          value_type: (primitive_type))))))
+
+================================================================================
+Named tuple type
+================================================================================
+
+type tReq = (caller: machine, key: string, val: int);
+
+--------------------------------------------------------------------------------
+
+(program
+  (type_def_decl
+    (p_type_def
+      name: (identifier)
+      (named_tuple_type
+        (iden_type_list
+          (iden_type
+            name: (identifier)
+            type: (primitive_type))
+          (iden_type
+            name: (identifier)
+            type: (primitive_type))
+          (iden_type
+            name: (identifier)
+            type: (primitive_type)))))))
+
+================================================================================
+Seq of named tuple
+================================================================================
+
+type tRows = seq[(id: int, name: string)];
+
+--------------------------------------------------------------------------------
+
+(program
+  (type_def_decl
+    (p_type_def
+      name: (identifier)
+      (seq_type
+        (named_tuple_type
+          (iden_type_list
+            (iden_type
+              name: (identifier)
+              type: (primitive_type))
+            (iden_type
+              name: (identifier)
+              type: (primitive_type))))))))
+
+================================================================================
+Named type reference
+================================================================================
+
+type tAlias = tOriginal;
+
+--------------------------------------------------------------------------------
+
+(program
+  (type_def_decl
+    (p_type_def
+      name: (identifier)
+      (named_type
+        name: (identifier)))))
+
+================================================================================
+Complex nested types (seq of map of set)
+================================================================================
+
+type tComplex = seq[map[string, set[int]]];
+
+--------------------------------------------------------------------------------
+
+(program
+  (type_def_decl
+    (p_type_def
+      name: (identifier)
+      (seq_type
+        (map_type
+          key_type: (primitive_type)
+          value_type: (set_type
+            (primitive_type)))))))
+
+================================================================================
+Tuple type
+================================================================================
+
+type tTuple = (int, string, bool);
+
+--------------------------------------------------------------------------------
+
+(program
+  (type_def_decl
+    (p_type_def
+      name: (identifier)
+      (tuple_type
+        (primitive_type)
+        (primitive_type)
+        (primitive_type)))))

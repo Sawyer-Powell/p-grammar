@@ -1,0 +1,727 @@
+================================================================================
+Integer literal
+================================================================================
+
+machine M {
+    start state S {
+        entry { var x: int; x = 42; }
+    }
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (impl_machine_decl
+    name: (identifier)
+    (machine_body
+      (state_decl
+        name: (identifier)
+        (state_entry
+          (anon_event_handler
+            (function_body
+              (var_decl
+                (iden_list
+                  (identifier))
+                (primitive_type))
+              (assign_stmt
+                (lvalue
+                  name: (identifier))
+                rvalue: (int_literal)))))))))
+
+================================================================================
+Boolean literals
+================================================================================
+
+machine M {
+    start state S {
+        entry { var x: bool; x = true; x = false; }
+    }
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (impl_machine_decl
+    name: (identifier)
+    (machine_body
+      (state_decl
+        name: (identifier)
+        (state_entry
+          (anon_event_handler
+            (function_body
+              (var_decl
+                (iden_list
+                  (identifier))
+                (primitive_type))
+              (assign_stmt
+                (lvalue
+                  name: (identifier))
+                rvalue: (bool_literal))
+              (assign_stmt
+                (lvalue
+                  name: (identifier))
+                rvalue: (bool_literal)))))))))
+
+================================================================================
+String literal
+================================================================================
+
+machine M {
+    start state S {
+        entry { print "hello world"; }
+    }
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (impl_machine_decl
+    name: (identifier)
+    (machine_body
+      (state_decl
+        name: (identifier)
+        (state_entry
+          (anon_event_handler
+            (function_body
+              (print_stmt
+                message: (string_literal)))))))))
+
+================================================================================
+Null literal
+================================================================================
+
+machine M {
+    start state S {
+        entry { var x: any; x = null; }
+    }
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (impl_machine_decl
+    name: (identifier)
+    (machine_body
+      (state_decl
+        name: (identifier)
+        (state_entry
+          (anon_event_handler
+            (function_body
+              (var_decl
+                (iden_list
+                  (identifier))
+                (primitive_type))
+              (assign_stmt
+                (lvalue
+                  name: (identifier))
+                rvalue: (null_literal)))))))))
+
+================================================================================
+This keyword
+================================================================================
+
+machine M {
+    start state S {
+        entry { var x: machine; x = this; }
+    }
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (impl_machine_decl
+    name: (identifier)
+    (machine_body
+      (state_decl
+        name: (identifier)
+        (state_entry
+          (anon_event_handler
+            (function_body
+              (var_decl
+                (iden_list
+                  (identifier))
+                (primitive_type))
+              (assign_stmt
+                (lvalue
+                  name: (identifier))
+                rvalue: (this_keyword)))))))))
+
+================================================================================
+Nondet
+================================================================================
+
+fun HasBeans() : bool { return $; }
+
+--------------------------------------------------------------------------------
+
+(program
+  (fun_decl
+    (p_fun_decl
+      name: (identifier)
+      (primitive_type)
+      (function_body
+        (return_stmt
+          (nondet))))))
+
+================================================================================
+Binary expressions
+================================================================================
+
+fun Test(a: int, b: int) : bool {
+    return a + b * 2 > 10 && a != b;
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (fun_decl
+    (p_fun_decl
+      name: (identifier)
+      (fun_param_list
+        (fun_param
+          name: (identifier)
+          type: (primitive_type))
+        (fun_param
+          name: (identifier)
+          type: (primitive_type)))
+      (primitive_type)
+      (function_body
+        (return_stmt
+          (bin_expr
+            (bin_expr
+              (bin_expr
+                (identifier)
+                (bin_expr
+                  (identifier)
+                  (int_literal)))
+              (int_literal))
+            (bin_expr
+              (identifier)
+              (identifier))))))))
+
+================================================================================
+Unary not
+================================================================================
+
+fun Test(x: bool) : bool {
+    return !x;
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (fun_decl
+    (p_fun_decl
+      name: (identifier)
+      (fun_param_list
+        (fun_param
+          name: (identifier)
+          type: (primitive_type)))
+      (primitive_type)
+      (function_body
+        (return_stmt
+          (unary_expr
+            (identifier)))))))
+
+================================================================================
+Unary negate
+================================================================================
+
+fun Negate(x: int) : int {
+    return -x;
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (fun_decl
+    (p_fun_decl
+      name: (identifier)
+      (fun_param_list
+        (fun_param
+          name: (identifier)
+          type: (primitive_type)))
+      (primitive_type)
+      (function_body
+        (return_stmt
+          (unary_expr
+            (identifier)))))))
+
+================================================================================
+Named tuple access
+================================================================================
+
+fun GetKey(req: tReq) : string {
+    return req.key;
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (fun_decl
+    (p_fun_decl
+      name: (identifier)
+      (fun_param_list
+        (fun_param
+          name: (identifier)
+          type: (named_type
+            name: (identifier))))
+      (primitive_type)
+      (function_body
+        (return_stmt
+          (named_tuple_access_expr
+            (identifier)
+            field: (identifier)))))))
+
+================================================================================
+Seq/map access
+================================================================================
+
+fun GetItem(items: seq[int], i: int) : int {
+    return items[i];
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (fun_decl
+    (p_fun_decl
+      name: (identifier)
+      (fun_param_list
+        (fun_param
+          name: (identifier)
+          type: (seq_type
+            (primitive_type)))
+        (fun_param
+          name: (identifier)
+          type: (primitive_type)))
+      (primitive_type)
+      (function_body
+        (return_stmt
+          (seq_access_expr
+            seq: (identifier)
+            index: (identifier)))))))
+
+================================================================================
+Function call expression
+================================================================================
+
+fun Test() {
+    var x: int;
+    x = GetCount();
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (fun_decl
+    (p_fun_decl
+      name: (identifier)
+      (function_body
+        (var_decl
+          (iden_list
+            (identifier))
+          (primitive_type))
+        (assign_stmt
+          (lvalue
+            name: (identifier))
+          rvalue: (fun_call_expr
+            fun: (identifier)))))))
+
+================================================================================
+Keyword expressions
+================================================================================
+
+fun Test(m: map[int, string]) {
+    var k: seq[int];
+    var v: seq[string];
+    var n: int;
+    k = keys(m);
+    v = values(m);
+    n = sizeof(k);
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (fun_decl
+    (p_fun_decl
+      name: (identifier)
+      (fun_param_list
+        (fun_param
+          name: (identifier)
+          type: (map_type
+            key_type: (primitive_type)
+            value_type: (primitive_type))))
+      (function_body
+        (var_decl
+          (iden_list
+            (identifier))
+          (seq_type
+            (primitive_type)))
+        (var_decl
+          (iden_list
+            (identifier))
+          (seq_type
+            (primitive_type)))
+        (var_decl
+          (iden_list
+            (identifier))
+          (primitive_type))
+        (assign_stmt
+          (lvalue
+            name: (identifier))
+          rvalue: (keyword_expr
+            (identifier)))
+        (assign_stmt
+          (lvalue
+            name: (identifier))
+          rvalue: (keyword_expr
+            (identifier)))
+        (assign_stmt
+          (lvalue
+            name: (identifier))
+          rvalue: (keyword_expr
+            (identifier)))))))
+
+================================================================================
+Default expression
+================================================================================
+
+fun Test() {
+    var m: map[int, string];
+    m = default(map[int, string]);
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (fun_decl
+    (p_fun_decl
+      name: (identifier)
+      (function_body
+        (var_decl
+          (iden_list
+            (identifier))
+          (map_type
+            key_type: (primitive_type)
+            value_type: (primitive_type)))
+        (assign_stmt
+          (lvalue
+            name: (identifier))
+          rvalue: (keyword_expr
+            (map_type
+              key_type: (primitive_type)
+              value_type: (primitive_type))))))))
+
+================================================================================
+Named tuple expression
+================================================================================
+
+fun Test() {
+    send caller, eResp, (key = "hello", val = 42);
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (fun_decl
+    (p_fun_decl
+      name: (identifier)
+      (function_body
+        (send_stmt
+          machine: (identifier)
+          event: (identifier)
+          (rvalue_list
+            (named_tuple_expr
+              (named_tuple_field
+                name: (identifier)
+                value: (string_literal))
+              (named_tuple_field
+                name: (identifier)
+                value: (int_literal)))))))))
+
+================================================================================
+Cast expression
+================================================================================
+
+fun Test() {
+    var x: any;
+    var y: int;
+    x = 0;
+    y = x as int;
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (fun_decl
+    (p_fun_decl
+      name: (identifier)
+      (function_body
+        (var_decl
+          (iden_list
+            (identifier))
+          (primitive_type))
+        (var_decl
+          (iden_list
+            (identifier))
+          (primitive_type))
+        (assign_stmt
+          (lvalue
+            name: (identifier))
+          rvalue: (int_literal))
+        (assign_stmt
+          (lvalue
+            name: (identifier))
+          rvalue: (cast_expr
+            (identifier)
+            (primitive_type)))))))
+
+================================================================================
+In expression
+================================================================================
+
+fun Test(k: string, m: map[string, int]) : bool {
+    return k in m;
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (fun_decl
+    (p_fun_decl
+      name: (identifier)
+      (fun_param_list
+        (fun_param
+          name: (identifier)
+          type: (primitive_type))
+        (fun_param
+          name: (identifier)
+          type: (map_type
+            key_type: (primitive_type)
+            value_type: (primitive_type))))
+      (primitive_type)
+      (function_body
+        (return_stmt
+          (bin_expr
+            (identifier)
+            (identifier)))))))
+
+================================================================================
+Choose expression
+================================================================================
+
+fun Test() {
+    var x: int;
+    x = choose(3);
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (fun_decl
+    (p_fun_decl
+      name: (identifier)
+      (function_body
+        (var_decl
+          (iden_list
+            (identifier))
+          (primitive_type))
+        (assign_stmt
+          (lvalue
+            name: (identifier))
+          rvalue: (choose_expr
+            (int_literal)))))))
+
+================================================================================
+New expression
+================================================================================
+
+machine M {
+    start state S {
+        entry {
+            var c: CoffeeMaker;
+            c = new CoffeeMaker(this);
+        }
+    }
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (impl_machine_decl
+    name: (identifier)
+    (machine_body
+      (state_decl
+        name: (identifier)
+        (state_entry
+          (anon_event_handler
+            (function_body
+              (var_decl
+                (iden_list
+                  (identifier))
+                (named_type
+                  name: (identifier)))
+              (assign_stmt
+                (lvalue
+                  name: (identifier))
+                rvalue: (ctor_expr
+                  (identifier)
+                  (rvalue_list
+                    (this_keyword)))))))))))
+
+================================================================================
+Fair nondet ($$)
+================================================================================
+
+fun Test() : bool { return $$; }
+
+--------------------------------------------------------------------------------
+
+(program
+  (fun_decl
+    (p_fun_decl
+      name: (identifier)
+      (primitive_type)
+      (function_body
+        (return_stmt
+          (fairnondet))))))
+
+================================================================================
+Float literals
+================================================================================
+
+fun Test() {
+    var x: float;
+    x = 3.14;
+    x = .5;
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (fun_decl
+    (p_fun_decl
+      name: (identifier)
+      (function_body
+        (var_decl
+          (iden_list
+            (identifier))
+          (primitive_type))
+        (assign_stmt
+          (lvalue
+            name: (identifier))
+          rvalue: (float_literal))
+        (assign_stmt
+          (lvalue
+            name: (identifier))
+          rvalue: (float_literal))))))
+
+================================================================================
+String escape sequences
+================================================================================
+
+fun Test() {
+    print "hello\nworld";
+    print "tab\there";
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (fun_decl
+    (p_fun_decl
+      name: (identifier)
+      (function_body
+        (print_stmt
+          message: (string_literal
+            (escape_sequence)))
+        (print_stmt
+          message: (string_literal
+            (escape_sequence)))))))
+
+================================================================================
+Format string expression
+================================================================================
+
+fun Test() {
+    var msg: string;
+    msg = format("Hello {0}, you have {1} items", name, count);
+    print format("Value: {0}", x);
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (fun_decl
+    (p_fun_decl
+      name: (identifier)
+      (function_body
+        (var_decl
+          (iden_list
+            (identifier))
+          (primitive_type))
+        (assign_stmt
+          (lvalue
+            name: (identifier))
+          rvalue: (format_expr
+            (string_literal)
+            (rvalue_list
+              (identifier)
+              (identifier))))
+        (print_stmt
+          message: (format_expr
+            (string_literal)
+            (rvalue_list
+              (identifier))))))))
+
+================================================================================
+Left-associative addition
+================================================================================
+
+fun Test() : int {
+    return 1 + 2 + 3;
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (fun_decl
+    (p_fun_decl
+      name: (identifier)
+      (primitive_type)
+      (function_body
+        (return_stmt
+          (bin_expr
+            (bin_expr
+              (int_literal)
+              (int_literal))
+            (int_literal)))))))
+
+================================================================================
+Mixed operator precedence
+================================================================================
+
+fun Test() : int {
+    return 1 - 2 * 3 + 4 / 2;
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (fun_decl
+    (p_fun_decl
+      name: (identifier)
+      (primitive_type)
+      (function_body
+        (return_stmt
+          (bin_expr
+            (bin_expr
+              (int_literal)
+              (bin_expr
+                (int_literal)
+                (int_literal)))
+            (bin_expr
+              (int_literal)
+              (int_literal))))))))

@@ -1,0 +1,692 @@
+================================================================================
+Counter machine (plenful spec)
+================================================================================
+
+type tStartCountingReq  = (caller: machine, key: string);
+type tStartCountingResp = (key: string, val: int);
+
+event eStartCounting     : tStartCountingReq;
+event eStartCountingResp : tStartCountingResp;
+
+machine Counter {
+    var redis   : Redis;
+    var caller  : machine;
+    var key     : string;
+    var next_id : int;
+
+    start state Init {
+        entry (input: (redis: Redis)) {
+            redis   = input.redis;
+            next_id = 1;
+            goto Idle;
+        }
+    }
+
+    state Idle {
+        on eStartCounting do (req: tStartCountingReq) {
+            caller = req.caller;
+            key    = req.key;
+            goto Counting;
+        }
+    }
+
+    state Counting {
+        entry {
+            send redis, eRedisIncrBy,
+                (caller = this, req_id = next_id, key = key, amount = 1);
+        }
+
+        on eRedisIncrResp do (resp: tRedisIncrResp) {
+            next_id = next_id + 1;
+            if (resp.newval < 10) {
+                goto Counting;
+            } else {
+                send caller, eStartCountingResp, (key = key, val = resp.newval);
+                goto Idle;
+            }
+        }
+
+        on eRedisErrorResp do (resp: tRedisErrorResp) {
+            next_id = next_id + 1;
+            goto Counting;
+        }
+    }
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (type_def_decl
+    (p_type_def
+      name: (identifier)
+      (named_tuple_type
+        (iden_type_list
+          (iden_type
+            name: (identifier)
+            type: (primitive_type))
+          (iden_type
+            name: (identifier)
+            type: (primitive_type))))))
+  (type_def_decl
+    (p_type_def
+      name: (identifier)
+      (named_tuple_type
+        (iden_type_list
+          (iden_type
+            name: (identifier)
+            type: (primitive_type))
+          (iden_type
+            name: (identifier)
+            type: (primitive_type))))))
+  (event_decl
+    name: (identifier)
+    (named_type
+      name: (identifier)))
+  (event_decl
+    name: (identifier)
+    (named_type
+      name: (identifier)))
+  (impl_machine_decl
+    name: (identifier)
+    (machine_body
+      (var_decl
+        (iden_list
+          (identifier))
+        (named_type
+          name: (identifier)))
+      (var_decl
+        (iden_list
+          (identifier))
+        (primitive_type))
+      (var_decl
+        (iden_list
+          (identifier))
+        (primitive_type))
+      (var_decl
+        (iden_list
+          (identifier))
+        (primitive_type))
+      (state_decl
+        name: (identifier)
+        (state_entry
+          (anon_event_handler
+            (fun_param
+              name: (identifier)
+              type: (named_tuple_type
+                (iden_type_list
+                  (iden_type
+                    name: (identifier)
+                    type: (named_type
+                      name: (identifier))))))
+            (function_body
+              (assign_stmt
+                (lvalue
+                  name: (identifier))
+                rvalue: (named_tuple_access_expr
+                  (identifier)
+                  field: (identifier)))
+              (assign_stmt
+                (lvalue
+                  name: (identifier))
+                rvalue: (int_literal))
+              (goto_stmt
+                (state_name
+                  state: (identifier)))))))
+      (state_decl
+        name: (identifier)
+        (on_event_do_action
+          (event_list
+            (event_id
+              (identifier)))
+          (anon_event_handler
+            (fun_param
+              name: (identifier)
+              type: (named_type
+                name: (identifier)))
+            (function_body
+              (assign_stmt
+                (lvalue
+                  name: (identifier))
+                rvalue: (named_tuple_access_expr
+                  (identifier)
+                  field: (identifier)))
+              (assign_stmt
+                (lvalue
+                  name: (identifier))
+                rvalue: (named_tuple_access_expr
+                  (identifier)
+                  field: (identifier)))
+              (goto_stmt
+                (state_name
+                  state: (identifier)))))))
+      (state_decl
+        name: (identifier)
+        (state_entry
+          (anon_event_handler
+            (function_body
+              (send_stmt
+                machine: (identifier)
+                event: (identifier)
+                (rvalue_list
+                  (named_tuple_expr
+                    (named_tuple_field
+                      name: (identifier)
+                      value: (this_keyword))
+                    (named_tuple_field
+                      name: (identifier)
+                      value: (identifier))
+                    (named_tuple_field
+                      name: (identifier)
+                      value: (identifier))
+                    (named_tuple_field
+                      name: (identifier)
+                      value: (int_literal))))))))
+        (on_event_do_action
+          (event_list
+            (event_id
+              (identifier)))
+          (anon_event_handler
+            (fun_param
+              name: (identifier)
+              type: (named_type
+                name: (identifier)))
+            (function_body
+              (assign_stmt
+                (lvalue
+                  name: (identifier))
+                rvalue: (bin_expr
+                  (identifier)
+                  (int_literal)))
+              (if_stmt
+                condition: (bin_expr
+                  (named_tuple_access_expr
+                    (identifier)
+                    field: (identifier))
+                  (int_literal))
+                then: (compound_stmt
+                  (goto_stmt
+                    (state_name
+                      state: (identifier))))
+                else: (compound_stmt
+                  (send_stmt
+                    machine: (identifier)
+                    event: (identifier)
+                    (rvalue_list
+                      (named_tuple_expr
+                        (named_tuple_field
+                          name: (identifier)
+                          value: (identifier))
+                        (named_tuple_field
+                          name: (identifier)
+                          value: (named_tuple_access_expr
+                            (identifier)
+                            field: (identifier))))))
+                  (goto_stmt
+                    (state_name
+                      state: (identifier))))))))
+        (on_event_do_action
+          (event_list
+            (event_id
+              (identifier)))
+          (anon_event_handler
+            (fun_param
+              name: (identifier)
+              type: (named_type
+                name: (identifier)))
+            (function_body
+              (assign_stmt
+                (lvalue
+                  name: (identifier))
+                rvalue: (bin_expr
+                  (identifier)
+                  (int_literal)))
+              (goto_stmt
+                (state_name
+                  state: (identifier))))))))))
+
+================================================================================
+EspressoMachine spec monitor
+================================================================================
+
+event eInWarmUpState;
+event eInReadyState;
+event eErrorHappened;
+event eResetPerformed;
+
+spec EspressoMachineModesOfOperation
+observes eInWarmUpState, eInReadyState, eErrorHappened, eResetPerformed
+{
+  start state StartUp {
+    on eInWarmUpState goto WarmUp;
+  }
+
+  state WarmUp {
+    on eErrorHappened goto Error;
+    on eInReadyState goto Ready;
+  }
+
+  state Ready {
+    ignore eInReadyState;
+    on eErrorHappened goto Error;
+  }
+
+  state Error {
+    on eResetPerformed goto StartUp;
+    ignore eErrorHappened;
+  }
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (event_decl
+    name: (identifier))
+  (event_decl
+    name: (identifier))
+  (event_decl
+    name: (identifier))
+  (event_decl
+    name: (identifier))
+  (spec_machine_decl
+    name: (identifier)
+    (event_set_literal
+      (non_default_event
+        (identifier))
+      (non_default_event
+        (identifier))
+      (non_default_event
+        (identifier))
+      (non_default_event
+        (identifier)))
+    (machine_body
+      (state_decl
+        name: (identifier)
+        (on_event_goto_state
+          (event_list
+            (event_id
+              (identifier)))
+          (state_name
+            state: (identifier))))
+      (state_decl
+        name: (identifier)
+        (on_event_goto_state
+          (event_list
+            (event_id
+              (identifier)))
+          (state_name
+            state: (identifier)))
+        (on_event_goto_state
+          (event_list
+            (event_id
+              (identifier)))
+          (state_name
+            state: (identifier))))
+      (state_decl
+        name: (identifier)
+        (state_ignore
+          (non_default_event_list
+            (non_default_event
+              (identifier))))
+        (on_event_goto_state
+          (event_list
+            (event_id
+              (identifier)))
+          (state_name
+            state: (identifier))))
+      (state_decl
+        name: (identifier)
+        (on_event_goto_state
+          (event_list
+            (event_id
+              (identifier)))
+          (state_name
+            state: (identifier)))
+        (state_ignore
+          (non_default_event_list
+            (non_default_event
+              (identifier))))))))
+
+================================================================================
+Module and test declarations
+================================================================================
+
+module EspressoMachine = { CoffeeMakerControlPanel, EspressoCoffeeMaker };
+module Users = { SaneUser, CrazyUser };
+
+test tcSafe [main=TestWithSaneUser]:
+  assert EspressoMachineModesOfOperation in (union { TestWithSaneUser }, EspressoMachine, Users);
+
+--------------------------------------------------------------------------------
+
+(program
+  (named_module_decl
+    name: (identifier)
+    (primitive_module_expr
+      (bind_expr
+        machine_name: (identifier))
+      (bind_expr
+        machine_name: (identifier))))
+  (named_module_decl
+    name: (identifier)
+    (primitive_module_expr
+      (bind_expr
+        machine_name: (identifier))
+      (bind_expr
+        machine_name: (identifier))))
+  (test_decl
+    (safety_test_decl
+      name: (identifier)
+      main_machine: (identifier)
+      (assert_module_expr
+        (iden_list
+          (identifier))
+        (paren_module_expr
+          (union_module_expr
+            (primitive_module_expr
+              (bind_expr
+                machine_name: (identifier)))
+            (named_module
+              (identifier))
+            (named_module
+              (identifier))))))))
+
+================================================================================
+Nondeterministic functions
+================================================================================
+
+machine EspressoCoffeeMaker {
+  start state WaitForRequests {
+    entry (c: CoffeeMakerControlPanel) {}
+    on eGrindBeansReq do {
+      if (!HasBeans()) {
+        send controller, eNoBeansError;
+      }
+    }
+  }
+  fun HasBeans() : bool { return $; }
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (impl_machine_decl
+    name: (identifier)
+    (machine_body
+      (state_decl
+        name: (identifier)
+        (state_entry
+          (anon_event_handler
+            (fun_param
+              name: (identifier)
+              type: (named_type
+                name: (identifier)))
+            (function_body)))
+        (on_event_do_action
+          (event_list
+            (event_id
+              (identifier)))
+          (anon_event_handler
+            (function_body
+              (if_stmt
+                condition: (unary_expr
+                  (fun_call_expr
+                    fun: (identifier)))
+                then: (compound_stmt
+                  (send_stmt
+                    machine: (identifier)
+                    event: (identifier))))))))
+      (fun_decl
+        (p_fun_decl
+          name: (identifier)
+          (primitive_type)
+          (function_body
+            (return_stmt
+              (nondet))))))))
+
+================================================================================
+S3 machine patterns (enums, nested maps, failure injection)
+================================================================================
+
+enum tS3Status {
+    S3_OK,
+    S3_NOT_FOUND,
+    S3_ERROR
+}
+
+type tS3UploadReq   = (caller: machine, req_id: int, bucket: string, key: string, val: any);
+type tS3DownloadReq = (caller: machine, req_id: int, bucket: string, key: string);
+
+event eS3Upload   : tS3UploadReq;
+event eS3Download : tS3DownloadReq;
+event eS3Down;
+event eS3Up;
+event eS3UploadResp   : tS3UploadResp;
+event eS3ErrorResp    : tS3ErrorResp;
+
+machine S3
+{
+    var store : map[string, map[string, any]];
+
+    start state Init {
+        entry {
+            goto Up;
+        }
+    }
+
+    state Up {
+        on eS3Down goto Down;
+
+        on eS3Upload do (req: tS3UploadReq) {
+            if (!(req.bucket in store)) {
+                store[req.bucket] = default(map[string, any]);
+            }
+            store[req.bucket][req.key] = req.val;
+            send req.caller, eS3UploadResp,
+                (req_id = req.req_id, bucket = req.bucket, key = req.key, status = S3_OK);
+        }
+    }
+
+    state Down {
+        on eS3Up goto Up;
+        on eS3Upload do (req: tS3UploadReq) { send req.caller, eS3ErrorResp, (req_id = req.req_id, status = S3_ERROR); }
+    }
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (enum_type_def_decl
+    name: (identifier)
+    (enum_elem_list
+      (enum_elem
+        name: (identifier))
+      (enum_elem
+        name: (identifier))
+      (enum_elem
+        name: (identifier))))
+  (type_def_decl
+    (p_type_def
+      name: (identifier)
+      (named_tuple_type
+        (iden_type_list
+          (iden_type
+            name: (identifier)
+            type: (primitive_type))
+          (iden_type
+            name: (identifier)
+            type: (primitive_type))
+          (iden_type
+            name: (identifier)
+            type: (primitive_type))
+          (iden_type
+            name: (identifier)
+            type: (primitive_type))
+          (iden_type
+            name: (identifier)
+            type: (primitive_type))))))
+  (type_def_decl
+    (p_type_def
+      name: (identifier)
+      (named_tuple_type
+        (iden_type_list
+          (iden_type
+            name: (identifier)
+            type: (primitive_type))
+          (iden_type
+            name: (identifier)
+            type: (primitive_type))
+          (iden_type
+            name: (identifier)
+            type: (primitive_type))
+          (iden_type
+            name: (identifier)
+            type: (primitive_type))))))
+  (event_decl
+    name: (identifier)
+    (named_type
+      name: (identifier)))
+  (event_decl
+    name: (identifier)
+    (named_type
+      name: (identifier)))
+  (event_decl
+    name: (identifier))
+  (event_decl
+    name: (identifier))
+  (event_decl
+    name: (identifier)
+    (named_type
+      name: (identifier)))
+  (event_decl
+    name: (identifier)
+    (named_type
+      name: (identifier)))
+  (impl_machine_decl
+    name: (identifier)
+    (machine_body
+      (var_decl
+        (iden_list
+          (identifier))
+        (map_type
+          key_type: (primitive_type)
+          value_type: (map_type
+            key_type: (primitive_type)
+            value_type: (primitive_type))))
+      (state_decl
+        name: (identifier)
+        (state_entry
+          (anon_event_handler
+            (function_body
+              (goto_stmt
+                (state_name
+                  state: (identifier)))))))
+      (state_decl
+        name: (identifier)
+        (on_event_goto_state
+          (event_list
+            (event_id
+              (identifier)))
+          (state_name
+            state: (identifier)))
+        (on_event_do_action
+          (event_list
+            (event_id
+              (identifier)))
+          (anon_event_handler
+            (fun_param
+              name: (identifier)
+              type: (named_type
+                name: (identifier)))
+            (function_body
+              (if_stmt
+                condition: (unary_expr
+                  (paren_expr
+                    (bin_expr
+                      (named_tuple_access_expr
+                        (identifier)
+                        field: (identifier))
+                      (identifier))))
+                then: (compound_stmt
+                  (assign_stmt
+                    (lvalue
+                      (lvalue
+                        name: (identifier))
+                      (named_tuple_access_expr
+                        (identifier)
+                        field: (identifier)))
+                    rvalue: (keyword_expr
+                      (map_type
+                        key_type: (primitive_type)
+                        value_type: (primitive_type))))))
+              (assign_stmt
+                (lvalue
+                  (lvalue
+                    (lvalue
+                      name: (identifier))
+                    (named_tuple_access_expr
+                      (identifier)
+                      field: (identifier)))
+                  (named_tuple_access_expr
+                    (identifier)
+                    field: (identifier)))
+                rvalue: (named_tuple_access_expr
+                  (identifier)
+                  field: (identifier)))
+              (send_stmt
+                machine: (named_tuple_access_expr
+                  (identifier)
+                  field: (identifier))
+                event: (identifier)
+                (rvalue_list
+                  (named_tuple_expr
+                    (named_tuple_field
+                      name: (identifier)
+                      value: (named_tuple_access_expr
+                        (identifier)
+                        field: (identifier)))
+                    (named_tuple_field
+                      name: (identifier)
+                      value: (named_tuple_access_expr
+                        (identifier)
+                        field: (identifier)))
+                    (named_tuple_field
+                      name: (identifier)
+                      value: (named_tuple_access_expr
+                        (identifier)
+                        field: (identifier)))
+                    (named_tuple_field
+                      name: (identifier)
+                      value: (identifier)))))))))
+      (state_decl
+        name: (identifier)
+        (on_event_goto_state
+          (event_list
+            (event_id
+              (identifier)))
+          (state_name
+            state: (identifier)))
+        (on_event_do_action
+          (event_list
+            (event_id
+              (identifier)))
+          (anon_event_handler
+            (fun_param
+              name: (identifier)
+              type: (named_type
+                name: (identifier)))
+            (function_body
+              (send_stmt
+                machine: (named_tuple_access_expr
+                  (identifier)
+                  field: (identifier))
+                event: (identifier)
+                (rvalue_list
+                  (named_tuple_expr
+                    (named_tuple_field
+                      name: (identifier)
+                      value: (named_tuple_access_expr
+                        (identifier)
+                        field: (identifier)))
+                    (named_tuple_field
+                      name: (identifier)
+                      value: (identifier))))))))))))

@@ -1,0 +1,518 @@
+================================================================================
+Foreign type definition
+================================================================================
+
+type tPriorityQueue;
+
+--------------------------------------------------------------------------------
+
+(program
+  (type_def_decl
+    (foreign_type_def
+      name: (identifier))))
+
+================================================================================
+Type alias definition
+================================================================================
+
+type tKey = int;
+
+--------------------------------------------------------------------------------
+
+(program
+  (type_def_decl
+    (p_type_def
+      name: (identifier)
+      (primitive_type))))
+
+================================================================================
+Named tuple type definition
+================================================================================
+
+type tRequest = (caller: machine, key: string);
+
+--------------------------------------------------------------------------------
+
+(program
+  (type_def_decl
+    (p_type_def
+      name: (identifier)
+      (named_tuple_type
+        (iden_type_list
+          (iden_type
+            name: (identifier)
+            type: (primitive_type))
+          (iden_type
+            name: (identifier)
+            type: (primitive_type)))))))
+
+================================================================================
+Enum definition
+================================================================================
+
+enum tStatus {
+  OK,
+  NOT_FOUND,
+  ERROR
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (enum_type_def_decl
+    name: (identifier)
+    (enum_elem_list
+      (enum_elem
+        name: (identifier))
+      (enum_elem
+        name: (identifier))
+      (enum_elem
+        name: (identifier)))))
+
+================================================================================
+Numbered enum definition
+================================================================================
+
+enum tLevel {
+  LOW = 0,
+  HIGH = 1
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (enum_type_def_decl
+    name: (identifier)
+    (numbered_enum_elem_list
+      (numbered_enum_elem
+        name: (identifier)
+        value: (int_literal))
+      (numbered_enum_elem
+        name: (identifier)
+        value: (int_literal)))))
+
+================================================================================
+Event declaration without payload
+================================================================================
+
+event eStart;
+
+--------------------------------------------------------------------------------
+
+(program
+  (event_decl
+    name: (identifier)))
+
+================================================================================
+Event declaration with payload type
+================================================================================
+
+event eRequest : tRequestPayload;
+
+--------------------------------------------------------------------------------
+
+(program
+  (event_decl
+    name: (identifier)
+    (named_type
+      name: (identifier))))
+
+================================================================================
+Event set declaration
+================================================================================
+
+eventset esErrors = { eTimeout, eDisconnect };
+
+--------------------------------------------------------------------------------
+
+(program
+  (event_set_decl
+    name: (identifier)
+    (event_set_literal
+      (non_default_event
+        (identifier))
+      (non_default_event
+        (identifier)))))
+
+================================================================================
+Simple machine declaration
+================================================================================
+
+machine Counter {
+    var count: int;
+    start state Init {
+        entry {
+            count = 0;
+        }
+    }
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (impl_machine_decl
+    name: (identifier)
+    (machine_body
+      (var_decl
+        (iden_list
+          (identifier))
+        (primitive_type))
+      (state_decl
+        name: (identifier)
+        (state_entry
+          (anon_event_handler
+            (function_body
+              (assign_stmt
+                (lvalue
+                  name: (identifier))
+                rvalue: (int_literal)))))))))
+
+================================================================================
+Spec machine declaration
+================================================================================
+
+spec Monitor observes eUpdate, eDelete {
+    start state Watching {
+        on eUpdate goto Updated;
+        on eDelete goto Deleted;
+    }
+    state Updated {}
+    state Deleted {}
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (spec_machine_decl
+    name: (identifier)
+    (event_set_literal
+      (non_default_event
+        (identifier))
+      (non_default_event
+        (identifier)))
+    (machine_body
+      (state_decl
+        name: (identifier)
+        (on_event_goto_state
+          (event_list
+            (event_id
+              (identifier)))
+          (state_name
+            state: (identifier)))
+        (on_event_goto_state
+          (event_list
+            (event_id
+              (identifier)))
+          (state_name
+            state: (identifier))))
+      (state_decl
+        name: (identifier))
+      (state_decl
+        name: (identifier)))))
+
+================================================================================
+Foreign function declaration
+================================================================================
+
+fun RandomInt(): int;
+
+--------------------------------------------------------------------------------
+
+(program
+  (fun_decl
+    (foreign_fun_decl
+      name: (identifier)
+      (primitive_type))))
+
+================================================================================
+Function with body
+================================================================================
+
+fun Add(a: int, b: int) : int {
+    return a + b;
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (fun_decl
+    (p_fun_decl
+      name: (identifier)
+      (fun_param_list
+        (fun_param
+          name: (identifier)
+          type: (primitive_type))
+        (fun_param
+          name: (identifier)
+          type: (primitive_type)))
+      (primitive_type)
+      (function_body
+        (return_stmt
+          (bin_expr
+            (identifier)
+            (identifier)))))))
+
+================================================================================
+Module declaration
+================================================================================
+
+module MySystem = { MachineA, MachineB };
+
+--------------------------------------------------------------------------------
+
+(program
+  (named_module_decl
+    name: (identifier)
+    (primitive_module_expr
+      (bind_expr
+        machine_name: (identifier))
+      (bind_expr
+        machine_name: (identifier)))))
+
+================================================================================
+Interface declaration
+================================================================================
+
+interface IServer(tRequest) receives eResponse;
+
+--------------------------------------------------------------------------------
+
+(program
+  (interface_decl
+    name: (identifier)
+    (named_type
+      name: (identifier))
+    (non_default_event_list
+      (non_default_event
+        (identifier)))))
+
+================================================================================
+Global param declaration
+================================================================================
+
+param nOps : int;
+
+--------------------------------------------------------------------------------
+
+(program
+  (global_param_decl
+    (iden_list
+      (identifier))
+    (primitive_type)))
+
+================================================================================
+Implementation declaration
+================================================================================
+
+implementation DefaultImpl [main=TestDriver]: compose MyModule, { TestDriver };
+
+--------------------------------------------------------------------------------
+
+(program
+  (implementation_decl
+    name: (identifier)
+    main_machine: (identifier)
+    (compose_module_expr
+      (named_module
+        (identifier))
+      (primitive_module_expr
+        (bind_expr
+          machine_name: (identifier))))))
+
+================================================================================
+Safety test declaration
+================================================================================
+
+test tcSafe [main=TestDriver]:
+  assert Monitor in (union { TestDriver }, MySystem);
+
+--------------------------------------------------------------------------------
+
+(program
+  (test_decl
+    (safety_test_decl
+      name: (identifier)
+      main_machine: (identifier)
+      (assert_module_expr
+        (iden_list
+          (identifier))
+        (paren_module_expr
+          (union_module_expr
+            (primitive_module_expr
+              (bind_expr
+                machine_name: (identifier)))
+            (named_module
+              (identifier))))))))
+
+================================================================================
+Parameterized test declaration
+================================================================================
+
+test param (n in [1, 2, 3]) tcParam [main=TestDriver]:
+  assert Monitor in { TestDriver };
+
+--------------------------------------------------------------------------------
+
+(program
+  (test_decl
+    (safety_test_decl
+      (test_param
+        (param_body
+          (identifier)
+          (seq_literal
+            (seq_literal_body
+              (int_literal)
+              (int_literal)
+              (int_literal)))))
+      name: (identifier)
+      main_machine: (identifier)
+      (assert_module_expr
+        (iden_list
+          (identifier))
+        (primitive_module_expr
+          (bind_expr
+            machine_name: (identifier)))))))
+
+================================================================================
+Pure function declaration
+================================================================================
+
+pure head(): machine;
+
+--------------------------------------------------------------------------------
+
+(program
+  (pure_decl
+    name: (identifier)
+    (primitive_type)))
+
+================================================================================
+Pure function with body
+================================================================================
+
+pure owns(n: Node, k: tKey): bool = k in n.kv;
+
+--------------------------------------------------------------------------------
+
+(program
+  (pure_decl
+    name: (identifier)
+    (fun_param_list
+      (fun_param
+        name: (identifier)
+        type: (named_type
+          name: (identifier)))
+      (fun_param
+        name: (identifier)
+        type: (named_type
+          name: (identifier))))
+    (primitive_type)
+    body: (bin_expr
+      (identifier)
+      (named_tuple_access_expr
+        (identifier)
+        field: (identifier)))))
+
+================================================================================
+Machine with receives and sends
+================================================================================
+
+machine Worker
+    receives eRequest, eConfig;
+    sends eResponse, eError;
+{
+    start state Init {}
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (impl_machine_decl
+    name: (identifier)
+    (receives_sends
+      (machine_receive
+        (event_set_literal
+          (non_default_event
+            (identifier))
+          (non_default_event
+            (identifier)))))
+    (receives_sends
+      (machine_send
+        (event_set_literal
+          (non_default_event
+            (identifier))
+          (non_default_event
+            (identifier)))))
+    (machine_body
+      (state_decl
+        name: (identifier)))))
+
+================================================================================
+Refinement test declaration
+================================================================================
+
+test tcRefine [main=TestDriver]: compose ImplModule, { TestDriver } refines compose SpecModule, { TestDriver };
+
+--------------------------------------------------------------------------------
+
+(program
+  (test_decl
+    (refinement_test_decl
+      name: (identifier)
+      main_machine: (identifier)
+      (compose_module_expr
+        (named_module
+          (identifier))
+        (primitive_module_expr
+          (bind_expr
+            machine_name: (identifier))))
+      (compose_module_expr
+        (named_module
+          (identifier))
+        (primitive_module_expr
+          (bind_expr
+            machine_name: (identifier)))))))
+
+================================================================================
+Empty machine body
+================================================================================
+
+machine Empty {}
+
+--------------------------------------------------------------------------------
+
+(program
+  (impl_machine_decl
+    name: (identifier)
+    (machine_body)))
+
+================================================================================
+Empty state body
+================================================================================
+
+machine M {
+    start state S {}
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (impl_machine_decl
+    name: (identifier)
+    (machine_body
+      (state_decl
+        name: (identifier)))))
+
+================================================================================
+Empty function body
+================================================================================
+
+fun NoOp() {}
+
+--------------------------------------------------------------------------------
+
+(program
+  (fun_decl
+    (p_fun_decl
+      name: (identifier)
+      (function_body))))

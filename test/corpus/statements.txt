@@ -1,0 +1,610 @@
+================================================================================
+Variable declaration
+================================================================================
+
+fun Test() {
+    var x: int;
+    var a, b: string;
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (fun_decl
+    (p_fun_decl
+      name: (identifier)
+      (function_body
+        (var_decl
+          (iden_list
+            (identifier))
+          (primitive_type))
+        (var_decl
+          (iden_list
+            (identifier)
+            (identifier))
+          (primitive_type))))))
+
+================================================================================
+Assignment statement
+================================================================================
+
+fun Test() {
+    var x: int;
+    x = 42;
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (fun_decl
+    (p_fun_decl
+      name: (identifier)
+      (function_body
+        (var_decl
+          (iden_list
+            (identifier))
+          (primitive_type))
+        (assign_stmt
+          (lvalue
+            name: (identifier))
+          rvalue: (int_literal))))))
+
+================================================================================
+Send statement
+================================================================================
+
+fun Test() {
+    send target, eRequest, (key = "abc", val = 1);
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (fun_decl
+    (p_fun_decl
+      name: (identifier)
+      (function_body
+        (send_stmt
+          machine: (identifier)
+          event: (identifier)
+          (rvalue_list
+            (named_tuple_expr
+              (named_tuple_field
+                name: (identifier)
+                value: (string_literal))
+              (named_tuple_field
+                name: (identifier)
+                value: (int_literal)))))))))
+
+================================================================================
+Send with dotted machine
+================================================================================
+
+fun Test() {
+    send req.caller, eResp;
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (fun_decl
+    (p_fun_decl
+      name: (identifier)
+      (function_body
+        (send_stmt
+          machine: (named_tuple_access_expr
+            (identifier)
+            field: (identifier))
+          event: (identifier))))))
+
+================================================================================
+Goto statement
+================================================================================
+
+fun Test() {
+    goto Ready;
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (fun_decl
+    (p_fun_decl
+      name: (identifier)
+      (function_body
+        (goto_stmt
+          (state_name
+            state: (identifier)))))))
+
+================================================================================
+Raise statement
+================================================================================
+
+fun Test() {
+    raise halt;
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (fun_decl
+    (p_fun_decl
+      name: (identifier)
+      (function_body
+        (raise_stmt
+          (halt_keyword))))))
+
+================================================================================
+Announce statement
+================================================================================
+
+fun Test() {
+    announce eStateChanged;
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (fun_decl
+    (p_fun_decl
+      name: (identifier)
+      (function_body
+        (announce_stmt
+          (identifier))))))
+
+================================================================================
+Return statement
+================================================================================
+
+fun Test() : int {
+    return 42;
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (fun_decl
+    (p_fun_decl
+      name: (identifier)
+      (primitive_type)
+      (function_body
+        (return_stmt
+          (int_literal))))))
+
+================================================================================
+Return void statement
+================================================================================
+
+fun Test() {
+    return;
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (fun_decl
+    (p_fun_decl
+      name: (identifier)
+      (function_body
+        (return_stmt)))))
+
+================================================================================
+If statement
+================================================================================
+
+fun Test(x: int) {
+    if (x > 0) {
+        print "positive";
+    }
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (fun_decl
+    (p_fun_decl
+      name: (identifier)
+      (fun_param_list
+        (fun_param
+          name: (identifier)
+          type: (primitive_type)))
+      (function_body
+        (if_stmt
+          condition: (bin_expr
+            (identifier)
+            (int_literal))
+          then: (compound_stmt
+            (print_stmt
+              message: (string_literal))))))))
+
+================================================================================
+If-else statement
+================================================================================
+
+fun Test(x: int) {
+    if (x > 0) {
+        print "positive";
+    } else {
+        print "not positive";
+    }
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (fun_decl
+    (p_fun_decl
+      name: (identifier)
+      (fun_param_list
+        (fun_param
+          name: (identifier)
+          type: (primitive_type)))
+      (function_body
+        (if_stmt
+          condition: (bin_expr
+            (identifier)
+            (int_literal))
+          then: (compound_stmt
+            (print_stmt
+              message: (string_literal)))
+          else: (compound_stmt
+            (print_stmt
+              message: (string_literal))))))))
+
+
+================================================================================
+While statement
+================================================================================
+
+fun Test() {
+    var i: int;
+    i = 0;
+    while (i < 10) {
+        i = i + 1;
+    }
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (fun_decl
+    (p_fun_decl
+      name: (identifier)
+      (function_body
+        (var_decl
+          (iden_list
+            (identifier))
+          (primitive_type))
+        (assign_stmt
+          (lvalue
+            name: (identifier))
+          rvalue: (int_literal))
+        (while_stmt
+          condition: (bin_expr
+            (identifier)
+            (int_literal))
+          (compound_stmt
+            (assign_stmt
+              (lvalue
+                name: (identifier))
+              rvalue: (bin_expr
+                (identifier)
+                (int_literal)))))))))
+
+================================================================================
+Foreach statement
+================================================================================
+
+fun Test(items: seq[int]) {
+    var item: int;
+    foreach (item in items) {
+        print item;
+    }
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (fun_decl
+    (p_fun_decl
+      name: (identifier)
+      (fun_param_list
+        (fun_param
+          name: (identifier)
+          type: (seq_type
+            (primitive_type))))
+      (function_body
+        (var_decl
+          (iden_list
+            (identifier))
+          (primitive_type))
+        (foreach_stmt
+          item: (identifier)
+          collection: (identifier)
+          (compound_stmt
+            (print_stmt
+              message: (identifier))))))))
+
+================================================================================
+Assert statement
+================================================================================
+
+fun Test(x: int) {
+    assert x > 0;
+    assert x != 0, "x must not be zero";
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (fun_decl
+    (p_fun_decl
+      name: (identifier)
+      (fun_param_list
+        (fun_param
+          name: (identifier)
+          type: (primitive_type)))
+      (function_body
+        (assert_stmt
+          assertion: (bin_expr
+            (identifier)
+            (int_literal)))
+        (assert_stmt
+          assertion: (bin_expr
+            (identifier)
+            (int_literal))
+          message: (string_literal))))))
+
+================================================================================
+New constructor statement
+================================================================================
+
+machine M {
+    start state S {
+        entry {
+            new Worker(this);
+        }
+    }
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (impl_machine_decl
+    name: (identifier)
+    (machine_body
+      (state_decl
+        name: (identifier)
+        (state_entry
+          (anon_event_handler
+            (function_body
+              (ctor_stmt
+                (identifier)
+                (rvalue_list
+                  (this_keyword))))))))))
+
+================================================================================
+Fun call statement
+================================================================================
+
+fun Test() {
+    DoWork();
+    ProcessItem(42, "hello");
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (fun_decl
+    (p_fun_decl
+      name: (identifier)
+      (function_body
+        (fun_call_stmt
+          fun: (identifier))
+        (fun_call_stmt
+          fun: (identifier)
+          (rvalue_list
+            (int_literal)
+            (string_literal)))))))
+
+================================================================================
+Insert statement (map/seq with index)
+================================================================================
+
+fun Test() {
+    var s: seq[int];
+    s += (0, 42);
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (fun_decl
+    (p_fun_decl
+      name: (identifier)
+      (function_body
+        (var_decl
+          (iden_list
+            (identifier))
+          (seq_type
+            (primitive_type)))
+        (insert_stmt
+          (lvalue
+            name: (identifier))
+          (int_literal)
+          rvalue: (int_literal))))))
+
+================================================================================
+Add statement (set)
+================================================================================
+
+fun Test() {
+    var s: set[int];
+    s += (42);
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (fun_decl
+    (p_fun_decl
+      name: (identifier)
+      (function_body
+        (var_decl
+          (iden_list
+            (identifier))
+          (set_type
+            (primitive_type)))
+        (add_stmt
+          (lvalue
+            name: (identifier))
+          rvalue: (int_literal))))))
+
+================================================================================
+Remove statement
+================================================================================
+
+fun Test() {
+    var m: map[string, int];
+    m -= ("key");
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (fun_decl
+    (p_fun_decl
+      name: (identifier)
+      (function_body
+        (var_decl
+          (iden_list
+            (identifier))
+          (map_type
+            key_type: (primitive_type)
+            value_type: (primitive_type)))
+        (remove_stmt
+          (lvalue
+            name: (identifier))
+          value: (paren_expr
+            (string_literal)))))))
+
+================================================================================
+Receive statement
+================================================================================
+
+fun WaitForReady() {
+    receive {
+        case eReady: {}
+        case eError: (status: tStatus) {
+            raise halt;
+        }
+    }
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (fun_decl
+    (p_fun_decl
+      name: (identifier)
+      (function_body
+        (receive_stmt
+          (recv_case
+            (event_list
+              (event_id
+                (identifier)))
+            (anon_event_handler
+              (function_body)))
+          (recv_case
+            (event_list
+              (event_id
+                (identifier)))
+            (anon_event_handler
+              (fun_param
+                name: (identifier)
+                type: (named_type
+                  name: (identifier)))
+              (function_body
+                (raise_stmt
+                  (halt_keyword))))))))))
+
+================================================================================
+Break and continue
+================================================================================
+
+fun Test() {
+    var i: int;
+    i = 0;
+    while (i < 10) {
+        if (i == 5) { break; }
+        i = i + 1;
+        continue;
+    }
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (fun_decl
+    (p_fun_decl
+      name: (identifier)
+      (function_body
+        (var_decl
+          (iden_list
+            (identifier))
+          (primitive_type))
+        (assign_stmt
+          (lvalue
+            name: (identifier))
+          rvalue: (int_literal))
+        (while_stmt
+          condition: (bin_expr
+            (identifier)
+            (int_literal))
+          (compound_stmt
+            (if_stmt
+              condition: (bin_expr
+                (identifier)
+                (int_literal))
+              then: (compound_stmt
+                (break_stmt)))
+            (assign_stmt
+              (lvalue
+                name: (identifier))
+              rvalue: (bin_expr
+                (identifier)
+                (int_literal)))
+            (continue_stmt)))))))
+
+================================================================================
+Nested field access lvalue
+================================================================================
+
+fun Test() {
+    var m: map[string, map[string, int]];
+    m["a"]["b"] = 42;
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (fun_decl
+    (p_fun_decl
+      name: (identifier)
+      (function_body
+        (var_decl
+          (iden_list
+            (identifier))
+          (map_type
+            key_type: (primitive_type)
+            value_type: (map_type
+              key_type: (primitive_type)
+              value_type: (primitive_type))))
+        (assign_stmt
+          (lvalue
+            (lvalue
+              (lvalue
+                name: (identifier))
+              (string_literal))
+            (string_literal))
+          rvalue: (int_literal))))))

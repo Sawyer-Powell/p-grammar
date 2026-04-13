@@ -1,0 +1,182 @@
+================================================================================
+Invariant declaration
+================================================================================
+
+invariant Safety: forall (m: Machine) :: m.count >= 0;
+
+--------------------------------------------------------------------------------
+
+(program
+  (invariant_decl
+    name: (identifier)
+    body: (quant_expr
+      (fun_param_list
+        (fun_param
+          name: (identifier)
+          type: (named_type
+            name: (identifier))))
+      body: (bin_expr
+        (named_tuple_access_expr
+          (identifier)
+          field: (identifier))
+        (int_literal)))))
+
+================================================================================
+Lemma (invariant group)
+================================================================================
+
+Lemma Monotonicity {
+    invariant Inc: forall (m: Machine) :: m.count >= 0;
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (invariant_group_decl
+    name: (identifier)
+    (invariant_decl
+      name: (identifier)
+      body: (quant_expr
+        (fun_param_list
+          (fun_param
+            name: (identifier)
+            type: (named_type
+              name: (identifier))))
+        body: (bin_expr
+          (named_tuple_access_expr
+            (identifier)
+            field: (identifier))
+          (int_literal))))))
+
+================================================================================
+Theorem (invariant group)
+================================================================================
+
+Theorem Correctness {
+    invariant Total: forall (m: Machine) :: m.count >= 0;
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (invariant_group_decl
+    name: (identifier)
+    (invariant_decl
+      name: (identifier)
+      body: (quant_expr
+        (fun_param_list
+          (fun_param
+            name: (identifier)
+            type: (named_type
+              name: (identifier))))
+        body: (bin_expr
+          (named_tuple_access_expr
+            (identifier)
+            field: (identifier))
+          (int_literal))))))
+
+================================================================================
+Axiom declaration
+================================================================================
+
+axiom forall (x: int) :: x + 0 == x;
+
+--------------------------------------------------------------------------------
+
+(program
+  (axiom_decl
+    body: (quant_expr
+      (fun_param_list
+        (fun_param
+          name: (identifier)
+          type: (primitive_type)))
+      body: (bin_expr
+        (bin_expr
+          (identifier)
+          (int_literal))
+        (identifier)))))
+
+================================================================================
+Forall and exists quantifiers
+================================================================================
+
+invariant AllPos: forall (x: int) :: x >= 0;
+invariant ExPos: exists (x: int) :: x > 0;
+
+--------------------------------------------------------------------------------
+
+(program
+  (invariant_decl
+    name: (identifier)
+    body: (quant_expr
+      (fun_param_list
+        (fun_param
+          name: (identifier)
+          type: (primitive_type)))
+      body: (bin_expr
+        (identifier)
+        (int_literal))))
+  (invariant_decl
+    name: (identifier)
+    body: (quant_expr
+      (fun_param_list
+        (fun_param
+          name: (identifier)
+          type: (primitive_type)))
+      body: (bin_expr
+        (identifier)
+        (int_literal)))))
+
+================================================================================
+Implication operator (==>)
+================================================================================
+
+invariant Impl1: forall (a: int, b: int) :: (a > 0 ==> a + b > b);
+
+--------------------------------------------------------------------------------
+
+(program
+  (invariant_decl
+    name: (identifier)
+    body: (quant_expr
+      (fun_param_list
+        (fun_param
+          name: (identifier)
+          type: (primitive_type))
+        (fun_param
+          name: (identifier)
+          type: (primitive_type)))
+      body: (paren_expr
+        (bin_expr
+          (bin_expr
+            (identifier)
+            (int_literal))
+          (bin_expr
+            (bin_expr
+              (identifier)
+              (identifier))
+            (identifier)))))))
+
+================================================================================
+Biconditional operator (<==>)
+================================================================================
+
+invariant Equiv1: forall (a: bool) :: (a <==> !(!a));
+
+--------------------------------------------------------------------------------
+
+(program
+  (invariant_decl
+    name: (identifier)
+    body: (quant_expr
+      (fun_param_list
+        (fun_param
+          name: (identifier)
+          type: (primitive_type)))
+      body: (paren_expr
+        (bin_expr
+          (identifier)
+          (unary_expr
+            (paren_expr
+              (unary_expr
+                (identifier)))))))))

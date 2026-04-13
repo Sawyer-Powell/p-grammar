@@ -1,0 +1,23 @@
+{
+  "grammars": [
+    {
+      "name": "p",
+      "camelcase": "P",
+      "scope": "source.p",
+      "path": ".",
+      "file-types": ["p"]
+    }
+  ],
+  "metadata": {
+    "version": "0.1.0",
+    "license": "MIT",
+    "description": "Tree-sitter grammar for Microsoft's P language",
+    "links": {
+      "repository": "https://github.com/user/tree-sitter-p"
+    }
+  },
+  "bindings": {
+    "c": true,
+    "node": true
+  }
+}

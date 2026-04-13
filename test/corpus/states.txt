@@ -1,0 +1,354 @@
+================================================================================
+Start state
+================================================================================
+
+machine M {
+    start state Init {
+        entry { goto Running; }
+    }
+    state Running {}
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (impl_machine_decl
+    name: (identifier)
+    (machine_body
+      (state_decl
+        name: (identifier)
+        (state_entry
+          (anon_event_handler
+            (function_body
+              (goto_stmt
+                (state_name
+                  state: (identifier)))))))
+      (state_decl
+        name: (identifier)))))
+
+================================================================================
+Hot and cold states
+================================================================================
+
+machine M {
+    start hot state Active {}
+    cold state Idle {}
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (impl_machine_decl
+    name: (identifier)
+    (machine_body
+      (state_decl
+        name: (identifier))
+      (state_decl
+        name: (identifier)))))
+
+================================================================================
+Entry with parameter
+================================================================================
+
+machine M {
+    start state Init {
+        entry (config: tConfig) {
+            goto Ready;
+        }
+    }
+    state Ready {}
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (impl_machine_decl
+    name: (identifier)
+    (machine_body
+      (state_decl
+        name: (identifier)
+        (state_entry
+          (anon_event_handler
+            (fun_param
+              name: (identifier)
+              type: (named_type
+                name: (identifier)))
+            (function_body
+              (goto_stmt
+                (state_name
+                  state: (identifier)))))))
+      (state_decl
+        name: (identifier)))))
+
+================================================================================
+Entry with named function
+================================================================================
+
+machine M {
+    start state Init {
+        entry myHandler;
+    }
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (impl_machine_decl
+    name: (identifier)
+    (machine_body
+      (state_decl
+        name: (identifier)
+        (state_entry
+          fun_name: (identifier))))))
+
+================================================================================
+Exit handler
+================================================================================
+
+machine M {
+    start state Active {
+        exit {
+            count = count + 1;
+        }
+    }
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (impl_machine_decl
+    name: (identifier)
+    (machine_body
+      (state_decl
+        name: (identifier)
+        (state_exit
+          (no_param_anon_event_handler
+            (function_body
+              (assign_stmt
+                (lvalue
+                  name: (identifier))
+                rvalue: (bin_expr
+                  (identifier)
+                  (int_literal))))))))))
+
+================================================================================
+On event do action
+================================================================================
+
+machine M {
+    start state Ready {
+        on eRequest do (req: tReq) {
+            send req.caller, eResponse;
+        }
+    }
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (impl_machine_decl
+    name: (identifier)
+    (machine_body
+      (state_decl
+        name: (identifier)
+        (on_event_do_action
+          (event_list
+            (event_id
+              (identifier)))
+          (anon_event_handler
+            (fun_param
+              name: (identifier)
+              type: (named_type
+                name: (identifier)))
+            (function_body
+              (send_stmt
+                machine: (named_tuple_access_expr
+                  (identifier)
+                  field: (identifier))
+                event: (identifier)))))))))
+
+================================================================================
+On event do named function
+================================================================================
+
+machine M {
+    start state Ready {
+        on eRequest do handleRequest;
+    }
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (impl_machine_decl
+    name: (identifier)
+    (machine_body
+      (state_decl
+        name: (identifier)
+        (on_event_do_action
+          (event_list
+            (event_id
+              (identifier)))
+          fun_name: (identifier))))))
+
+================================================================================
+On event goto state
+================================================================================
+
+machine M {
+    start state Init {
+        on eReady goto Running;
+    }
+    state Running {}
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (impl_machine_decl
+    name: (identifier)
+    (machine_body
+      (state_decl
+        name: (identifier)
+        (on_event_goto_state
+          (event_list
+            (event_id
+              (identifier)))
+          (state_name
+            state: (identifier))))
+      (state_decl
+        name: (identifier)))))
+
+================================================================================
+On event goto with handler
+================================================================================
+
+machine M {
+    start state Init {
+        on eError goto ErrorState with {
+            print "Error occurred";
+        }
+    }
+    state ErrorState {}
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (impl_machine_decl
+    name: (identifier)
+    (machine_body
+      (state_decl
+        name: (identifier)
+        (on_event_goto_state
+          (event_list
+            (event_id
+              (identifier)))
+          (state_name
+            state: (identifier))
+          (anon_event_handler
+            (function_body
+              (print_stmt
+                message: (string_literal))))))
+      (state_decl
+        name: (identifier)))))
+
+================================================================================
+Defer and ignore
+================================================================================
+
+machine M {
+    start state Busy {
+        defer eRequest, eUpdate;
+        ignore eHeartbeat, halt;
+    }
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (impl_machine_decl
+    name: (identifier)
+    (machine_body
+      (state_decl
+        name: (identifier)
+        (state_defer
+          (non_default_event_list
+            (non_default_event
+              (identifier))
+            (non_default_event
+              (identifier))))
+        (state_ignore
+          (non_default_event_list
+            (non_default_event
+              (identifier))
+            (non_default_event)))))))
+
+================================================================================
+Multiple event handlers
+================================================================================
+
+machine M {
+    start state Ready {
+        on eA, eB do { goto Done; }
+        on eC goto Done;
+    }
+    state Done {}
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (impl_machine_decl
+    name: (identifier)
+    (machine_body
+      (state_decl
+        name: (identifier)
+        (on_event_do_action
+          (event_list
+            (event_id
+              (identifier))
+            (event_id
+              (identifier)))
+          (anon_event_handler
+            (function_body
+              (goto_stmt
+                (state_name
+                  state: (identifier))))))
+        (on_event_goto_state
+          (event_list
+            (event_id
+              (identifier)))
+          (state_name
+            state: (identifier))))
+      (state_decl
+        name: (identifier)))))
+
+================================================================================
+On event goto with named handler
+================================================================================
+
+machine M {
+    start state Init {
+        on eReady goto Running with prepareTransition;
+    }
+    state Running {}
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (impl_machine_decl
+    name: (identifier)
+    (machine_body
+      (state_decl
+        name: (identifier)
+        (on_event_goto_state
+          (event_list
+            (event_id
+              (identifier)))
+          (state_name
+            state: (identifier))
+          fun_name: (identifier)))
+      (state_decl
+        name: (identifier)))))
